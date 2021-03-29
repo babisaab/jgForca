@@ -1,36 +1,4 @@
-def boas_vindas
-    puts "Bem vindo ao jogo da Forca!"
-    puts "Qual é o seu nome?"
-    nome = gets.strip
-    puts "\n\n\n\n\n"
-    puts "Vamos começar o jogo pra você, #{nome}"
-    nome
-end
-
-def sorteia_palavra_secreta
-    puts "Definindo uma palavra secreta..."
-    palavra_secreta = "programador"
-    puts "Palavra secreta com #{palavra_secreta.size} letras... boa sorte!"
-    palavra_secreta
-end
-
-def não_quer_jogar?
-    puts "Deseja jogar novamente? (S/N)"
-    quero_jogar = gets.strip
-    não_quer_jogar = quero_jogar.upcase == "N"
-end
-
-nome = boas_vindas
-
-def pede_um_chute(chutes, erros)
-    puts "\n\n\n"
-    puts "Erros até agora: #{erros}"
-    puts "Chutes até agora: #{chutes}"
-    puts "Entre com uma letra ou uma palavra"
-    chute = gets.strip
-    puts "Será que você acertou? Você chutou #{chute}"
-    chute
-end
+require_relative 'ui'
 
 def joga(nome)
     palavra_secreta = sorteia_palavra_secreta
@@ -41,12 +9,36 @@ def joga(nome)
 
     while erros < 5
         chute = pede_um_chute chutes, erros
+        if chutes.include? chute
+            avisa_chute_efetuado chute
+            next #proximo laço
+        end
         chutes << chute
-
-        # verifica se acertou
+        
+        chutou_uma_letra = chute.size == 1
+        if chutou_uma_letra
+            letra_procurada = chute[0]
+            total_letras_encontradas = palavra_secreta.count letra_procurada #conta cada letra da string
+            if total_letras_encontradas == 0
+                avisa_letra_não_encontrada
+                erros += 1
+            else
+                avisa_letra_encontrada total_letras_encontradas
+            end
+        else
+            acertou = chute == palavra_secreta
+            if acertou
+                avisa_acertou_palavra
+                pontuacao_atual += 100
+                break
+            else
+                avisa_errou_palavra
+                pontuacao_atual -= 30
+                erros += 1
+             end
+        end
     end
-
-    puts "Você ganhou #{pontos_ate_agora} pontos."
+    avisa_pontuacao
 end
 
 loop do
